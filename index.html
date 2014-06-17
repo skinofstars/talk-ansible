@@ -1,111 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
 
-What is provisioning?
-- Preparing a server
-- Installing packages
-- Configuration
+  <title>Provision through the ansibles</title>
 
-... and how is that different from deployment?
-- Deployment is about updating app code, not server settings
+  <meta name="description" content="Provision through the ether">
+  <meta name="author" content="Kevin Carmody">
 
-Why would I use a provisioner tool? You just set up a server once don't you?!
-- Servers are cattle, not pets
-- Can you remember everything you did to set up a server?
-  - Server updates and pinning
-  - Ruby install
-  - Database setup
-  - Nginx config
-  - Service monitoring
-  - Logging
-  - Sendmail...
-  - Timezones?!
-- Repeatable setups, anywhere
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-I think we can already see some use cases
-- Any old server set-up
-- Vagrant
-- Cloud instances management
-- Workbox set-up
+  <link rel="stylesheet" href="css/reveal.min.css">
+  <link rel="stylesheet" href="css/theme/moon.css" id="theme">
 
-OK OK! What shall I use then?
-- SOMETHING!!!
-- Chef
-- Puppet
-- Salt
-- Ansible ...
-- ... finally! We get to the point!!
+  <!-- For syntax highlighting -->
+  <link rel="stylesheet" href="lib/css/zenburn.css">
 
-Ansible and its approach
-- Python, so pretty universal
-- Uses SSH, so no installing on remote systems
-- Scripting with YAML, so even an idiot can use it
+  <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+  <script>
+      // document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+  </script>
 
-Getting set up
-- Current version is 1.6.x
-- Install..
-  - apt:
-    - `apt-get install ansible` gets you 1.5.4
-  - pip:
-    - `easy_install pip`
-    - `pip install ansible`
-  - source:
-    - `easy_install pip`
-    - `pip install pyyaml jinja2 nose passlib pycrypto`
-    - `git clone git@github.com:ansible/ansible.git`
-    - `source ./hacking/env-setup`
+  <!--[if lt IE 9]>
+  <script src="lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
 
-hosts
-- host files
-  - INI format
-  - looks in `/etc/ansible/hosts`
+    <section>
+      <!-- <h1>Kevin and Ansible go provisioning</h1> -->
+      <h1>We need to talk about provisioning</h1>
+      <p>by Kevin</p>
+      <small>skinofstars</small>
+    </section>
 
-    [appservers]
-    192.168.1.23
-    192.168.1.99
+    <section>
 
-    or
+      <h3>What is provisioning?</h3>
+      <p class="fragment">Installing packages</p>
+      <p class="fragment">Configuration</p>
 
-    [myapp:children]
-    appservers
-    dbservers
+      <br />
+      <h3>What is deployment?</h3>
+      <p class="fragment">Updating app code</p>
+    </section>
 
-    [appservers]
-    pedrosa.example.com ansible_ssh_user=dani
-    lorenzo.example.com ansible_ssh_user=jorge
+    <section>
+      <h1>Servers are cattle, not pets</h1>
+    </section>
 
-    [dbservers]
-    db-[a:f].example.com
+    <section>
+      <h3>Can you remember everything you did to set up a server?</h3>
+      <ul>
+        <li class="fragment">Installs, updates, version pinning</li>
+        <li class="fragment">Ruby install</li>
+        <li class="fragment">Database setup</li>
+        <li class="fragment">Nginx config</li>
+        <li class="fragment">Service monitoring</li>
+        <li class="fragment">Logging</li>
+        <li class="fragment">Sendmail...</li>
+        <li class="fragment">Timezones?!</li>
+      </ul>
+    </section>
 
-- hosts as a var
-  - just pass it on the command line
-    - `ansible -i 192.168.1.46, do-something-interesting`
+    <section>
+      <h2>Repeatable setups, anywhere</h2>
+      <p>Vagrant</p>
+      <p>Any old server set-up</p>
+      <p>Cloud instances management</p>
+      <p>Workbox set-up</p>
+    </section>
+
+    <section>
+      <h3>OK OK! What shall I use then?</h3>
+      <h2 class="fragment">SOMETHING!!!</h2>
+      <div class="fragment">
+        <p>Chef
+        <p>Puppet
+        <p>Salt
+        <p>Ansible
+      </div>
+    </section>
+
+    <section>
+      <h3>Ansible...</h3>
+      <p> Uses <strong>Python</strong>, so pretty universal
+      <p>Uses <strong>SSH</strong>, so no installing on remote systems
+      <p>Scripting with <strong>YAML</strong>, so even an idiot can use it
+    </section>
+
+    <section>
+
+      <h3>Getting set up</h3>
+
+      <div class="fragment">
+        <p>apt-get</p>
+        <pre><code data-trim contenteditable>
+  apt-get install ansible
+        </code></pre>
+      </div>
+
+      <div class="fragment">
+        <p>pip</p>
+        <pre><code data-trim contenteditable>
+  easy_install pip
+  pip install ansible
+        </code></pre>
+      </div>
+
+      <div class="fragment">
+        <p>source</p>
+        <pre><code data-trim contenteditable>
+  easy_install pip
+  pip install pyyaml jinja2 nose passlib pycrypto
+  git clone git@github.com:ansible/ansible.git
+  source ./hacking/env-setup
+        </code></pre>
+      </div>
+    </section>
+
+    <section>
+
+      <h3>Defining your servers</h3>
+      <p>INI format host files</p>
+
+      <p><small>default - /etc/ansible/hosts</small><p>
+
+      <div class="fragment">
+        <pre><code data-trim contenteditable>
+  [appservers]
+  192.168.1.23
+  192.168.1.99
+        </code></pre>
+      </div>
+
+      <div class="fragment">
+        <p>or
+        <pre><code data-trim contenteditable>
+  [myapp:children]
+  appservers
+  dbservers
+
+  [appservers]
+  pedrosa.example.com ansible_ssh_user=dani
+  lorenzo.example.com ansible_ssh_user=jorge
+
+  [dbservers]
+  db-[a:f].example.com
+        </code></pre>
+      </div>
 
 
-Basic commands - aka ad-hoc
-- Issuing commands
-  - `ansible appservers -m copy -a "src=/etc/hosts dest=/tmp/hosts"`
-- I NEVER DO THIS!!!1!
+    </section>
 
-Playbooks
-- I ALWAYS DO THIS!!!2!
+    <section>
+      <h3>ad-hoc commands</h3>
+      <pre><code data-trim contenteditable>
+  ansible appservers -m copy -a "src=/etc/hosts dest=/tmp/hosts"
+      </code></pre>
 
-- Ok, basic idea
 
+      <p class="fragment">I NEVER DO THIS!!!1!
+
+    </section>
+
+    <section>
+      <h3>Playbooks</h3>
+      <p class="fragment">I ALWAYS DO THIS!!!2!</p>
+
+      <div class="fragment">
+        <pre><code data-trim contenteditable>
   ---
   # playbook.yml
 
-  - hosts: all
+  - hosts: appservers
     tasks:
       - name: Super secure secret sharing stuff
         copy: src=secrets.txt dest=/srv/public/secrets.txt mode=777
+        </code></pre>
 
-  `ansible-playbook appservers playbook.yml`
+        <pre><code data-trim contenteditable>
+  ansible-playbook appservers playbook.yml
+        </code></pre>
+      </div>
+    </section>
 
+    <section>
+      <section>
+      <h3>Vars</h3>
 
-- Vars
-
+      <div class="fragment">
+        <pre><code data-trim contenteditable>
   ---
   # playbook
-  - hosts: appservers
+  - hosts: all
     vars:
       my_common_packages:
         - curl
@@ -114,31 +205,42 @@ Playbooks
       - name: Install some stuff
         apt: pkg={{ item }} state=present
         with_items: my_common_packages
+        </code></pre>
+      </div>
+      </section>
 
+      <section>
+        <p>There are also a lot of built in variables, like <pre>{{ ansible_pkg_mgr }}</pre></p>
 
+          <pre><code data-trim contenteditable>
+  - name: Install some stuff on Debian
+    apt: pkg={{ item }} state=present
+    with_items:
+      - curl
+      - git
+    when: ansible_pkg_mgr == "apt"
+        </code></pre>
 
-  There are also a lot of built in variables, like `{{ ansible_pkg_mgr }}`
+      </section>
+    </section>
 
-    - name: Install some stuff on Debian
-      apt: pkg={{ item }} state=present
-      with_items:
-        - curl
-        - git
-      when: ansible_pkg_mgr == "apt"
+    <section>
 
+      <h3>Modules</h3>
 
+      <p>There are loads<p>
+      <p><strong>Common tasks</strong> like apt, git, pg/mysql/redis... or shell scripts</p>
 
-- modules
+      <p><strong>Services</strong> like AWS, Linode, etc </p>
+    </section>
 
-  There are loads
-    apt, git, pg/mysql/redis..,
-    ec2/linode...
-    raw shell scripts
+    <section>
+      <h3>Templates</h3>
 
+      <p>Uses jinja2</p>
 
-- templates
-
-  jinja2
+      <div class="fragment">
+      <pre><code data-trim contenteditable>
 
   ---
   # playbook.yml
@@ -151,16 +253,25 @@ Playbooks
       - name: Super secure secret sharing stuff
         copy: src=secrets.txt dest=/srv/public/secrets.txt mode=777
 
+      </code></pre>
 
-  # secrets.txt
-  My name is {{ name }}
-  The cash is at {{ loot }}
+      <pre><code data-trim contenteditable>
+        # secrets.txt
+        My name is {{ name }}
+        The cash is at {{ loot }}
+      </code></pre>
+    </div>
+    </section>
 
+    <section>
+      <h3>Roles and best practice</h3>
 
-Roles and best practice
+      <pre class="fragment"><code data-trim contenteditable>
+  staging.yml
+  production.yml
+      </code></pre>
 
-  site.yml
-
+      <pre class="fragment"><code data-trim contenteditable>
   /roles
     /nginx
       /handlers
@@ -171,16 +282,58 @@ Roles and best practice
         nginx.conf
       /vars
         main.yml
+      </code></pre>
+    </section>
 
-Resources
+    <section>
+      <h3>Resources</h3>
 
-  docs - http://docs.ansible.com/
+      <p>docs - <a href="http://docs.ansible.com/">docs.ansible.com</a>
 
-  ansible-examples - https://github.com/ansible/ansible-examples
+      <p>ansible-examples - <a href="https://github.com/ansible/ansible-examples">github.com/ansible/ansible-examples</a>
 
-  Galaxy - https://galaxy.ansible.com/
+      <p>Galaxy - <a href="https://galaxy.ansible.com/">galaxy.ansible.com</a>
 
-  Tower
+      <p>Tower - <a href="http://www.ansible.com/tower">ansible.com/tower</a>
+    </section>
+
+    <section>
+      <h1>fin</h1>
+  </div>
+</div>
 
 
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
 
+<script>
+
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+  controls: true,
+  progress: true,
+  history: true,
+  center: true,
+  transition: 'linear',
+  backgroundTransition: 'none', // default/none/slide/concave/convex/zoom
+
+  theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+  transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/none
+
+  // Optional libraries used to extend on reveal.js
+  dependencies: [
+    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+    // { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+    // { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+    // { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+    // { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+  ]
+});
+
+</script>
+
+</body>
+</html>
