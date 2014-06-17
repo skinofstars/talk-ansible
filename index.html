@@ -1,0 +1,186 @@
+
+What is provisioning?
+- Preparing a server
+- Installing packages
+- Configuration
+
+... and how is that different from deployment?
+- Deployment is about updating app code, not server settings
+
+Why would I use a provisioner tool? You just set up a server once don't you?!
+- Servers are cattle, not pets
+- Can you remember everything you did to set up a server?
+  - Server updates and pinning
+  - Ruby install
+  - Database setup
+  - Nginx config
+  - Service monitoring
+  - Logging
+  - Sendmail...
+  - Timezones?!
+- Repeatable setups, anywhere
+
+I think we can already see some use cases
+- Any old server set-up
+- Vagrant
+- Cloud instances management
+- Workbox set-up
+
+OK OK! What shall I use then?
+- SOMETHING!!!
+- Chef
+- Puppet
+- Salt
+- Ansible ...
+- ... finally! We get to the point!!
+
+Ansible and its approach
+- Python, so pretty universal
+- Uses SSH, so no installing on remote systems
+- Scripting with YAML, so even an idiot can use it
+
+Getting set up
+- Current version is 1.6.x
+- Install..
+  - apt:
+    - `apt-get install ansible` gets you 1.5.4
+  - pip:
+    - `easy_install pip`
+    - `pip install ansible`
+  - source:
+    - `easy_install pip`
+    - `pip install pyyaml jinja2 nose passlib pycrypto`
+    - `git clone git@github.com:ansible/ansible.git`
+    - `source ./hacking/env-setup`
+
+hosts
+- host files
+  - INI format
+  - looks in `/etc/ansible/hosts`
+
+    [appservers]
+    192.168.1.23
+    192.168.1.99
+
+    or
+
+    [myapp:children]
+    appservers
+    dbservers
+
+    [appservers]
+    pedrosa.example.com ansible_ssh_user=dani
+    lorenzo.example.com ansible_ssh_user=jorge
+
+    [dbservers]
+    db-[a:f].example.com
+
+- hosts as a var
+  - just pass it on the command line
+    - `ansible -i 192.168.1.46, do-something-interesting`
+
+
+Basic commands - aka ad-hoc
+- Issuing commands
+  - `ansible appservers -m copy -a "src=/etc/hosts dest=/tmp/hosts"`
+- I NEVER DO THIS!!!1!
+
+Playbooks
+- I ALWAYS DO THIS!!!2!
+
+- Ok, basic idea
+
+  ---
+  # playbook.yml
+
+  - hosts: all
+    tasks:
+      - name: Super secure secret sharing stuff
+        copy: src=secrets.txt dest=/srv/public/secrets.txt mode=777
+
+  `ansible-playbook appservers playbook.yml`
+
+
+- Vars
+
+  ---
+  # playbook
+  - hosts: appservers
+    vars:
+      my_common_packages:
+        - curl
+        - git
+    tasks:
+      - name: Install some stuff
+        apt: pkg={{ item }} state=present
+        with_items: my_common_packages
+
+
+
+  There are also a lot of built in variables, like `{{ ansible_pkg_mgr }}`
+
+    - name: Install some stuff on Debian
+      apt: pkg={{ item }} state=present
+      with_items:
+        - curl
+        - git
+      when: ansible_pkg_mgr == "apt"
+
+
+
+- modules
+
+  There are loads
+    apt, git, pg/mysql/redis..,
+    ec2/linode...
+    raw shell scripts
+
+
+- templates
+
+  jinja2
+
+  ---
+  # playbook.yml
+
+  - hosts: all
+    vars_prompt:
+      name: "What is your name?"
+      loot: "Where is the money?"
+    tasks:
+      - name: Super secure secret sharing stuff
+        copy: src=secrets.txt dest=/srv/public/secrets.txt mode=777
+
+
+  # secrets.txt
+  My name is {{ name }}
+  The cash is at {{ loot }}
+
+
+Roles and best practice
+
+  site.yml
+
+  /roles
+    /nginx
+      /handlers
+        main.yml
+      /tasks
+        main.yml
+      /templates
+        nginx.conf
+      /vars
+        main.yml
+
+Resources
+
+  docs - http://docs.ansible.com/
+
+  ansible-examples - https://github.com/ansible/ansible-examples
+
+  Galaxy - https://galaxy.ansible.com/
+
+  Tower
+
+
+
